@@ -21,9 +21,13 @@ import { toast } from "sonner";
 import CardMedia from "@mui/material/CardMedia";
 import { API_URL } from "../utils/constants";
 import { getCategories } from "../utils/api_category";
+import { useCookies } from "react-cookie";
 
 export default function Products() {
   const navigate = useNavigate();
+  const [cookies] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error if user not logged in
+  const { token = "" } = currentuser;
   // to store data from /products
   const [products, setProducts] = useState([]);
   // to track which page the user is in
@@ -58,7 +62,7 @@ export default function Products() {
       // once user confirm, then we delete the product
       if (result.isConfirmed) {
         // delete product at the backend
-        await deleteProduct(id);
+        await deleteProduct(id, token);
         // method #1: remove from the state manually
         // delete product from the state
         // setProducts(products.filter((p) => p._id !== id));
@@ -119,14 +123,16 @@ export default function Products() {
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             Products
           </Typography>
-          <Button
-            component={Link}
-            to="/products/new"
-            variant="contained"
-            color="success"
-          >
-            Add New
-          </Button>
+          {currentuser.role === "admin" && (
+            <Button
+              component={Link}
+              to="/products/new"
+              variant="contained"
+              color="success"
+            >
+              Add New
+            </Button>
+          )}
         </Box>
         <Box sx={{ pb: "20px" }}>
           <FormControl sx={{ minWidth: "250px" }}>
@@ -207,34 +213,36 @@ export default function Products() {
                     </Button>
                   </CardContent>
                   <CardActions sx={{ m: 0, p: 0 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
-                    >
-                      <Button
-                        component={Link}
-                        to={`/products/${product._id}/edit`}
-                        variant="contained"
-                        color="info"
-                        sx={{ borderRadius: 5 }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        sx={{ borderRadius: 5 }}
-                        onClick={() => {
-                          handleProductDelete(product._id);
+                    {currentuser.role === "admin" ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
                         }}
                       >
-                        Delete
-                      </Button>
-                    </Box>
+                        <Button
+                          component={Link}
+                          to={`/products/${product._id}/edit`}
+                          variant="contained"
+                          color="info"
+                          sx={{ borderRadius: 5 }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          sx={{ borderRadius: 5 }}
+                          onClick={() => {
+                            handleProductDelete(product._id);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    ) : null}
                   </CardActions>
                 </Card>
               </Grid>

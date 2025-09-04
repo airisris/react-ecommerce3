@@ -18,6 +18,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { uploadImage } from "../utils/api_image";
 import { API_URL } from "../utils/constants";
 import { getCategories } from "../utils/api_category";
+import { useCookies } from "react-cookie";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -34,6 +35,9 @@ const VisuallyHiddenInput = styled("input")({
 const ProductEdit = () => {
   const { id } = useParams(); // retrieve the id from the url
   const navigate = useNavigate();
+  const [cookies] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error if user not logged in
+  const { token = "" } = currentuser;
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
@@ -77,7 +81,7 @@ const ProductEdit = () => {
 
     try {
       // 2. trigger the API to update product
-      await updateProduct(id, name, description, price, category, image);
+      await updateProduct(id, name, description, price, category, image, token);
 
       // 3. if successful, redirect user back to home page and show success message
       toast.success("Product has been updated");
