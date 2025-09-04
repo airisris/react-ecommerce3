@@ -10,9 +10,11 @@ import validator from "email-validator";
 import Paper from "@mui/material/Paper";
 import { logIn } from "../utils/api_user";
 import { useNavigate } from "react-router";
+import { useCookies } from "react-cookie";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -26,8 +28,12 @@ const LoginPage = () => {
     } else {
       // do sign up
       try {
-        // create user
-        await logIn(email, password);
+        // login user
+        const userData = await logIn(email, password);
+        // set cookies
+        setCookie("currentuser", userData, {
+          maxAge: 60 * 60 * 8, // expire in 8 hours
+        });
         toast.success("You have successfully logged in");
         navigate("/");
       } catch (error) {
@@ -56,6 +62,7 @@ const LoginPage = () => {
           <Box mb={2}>
             <TextField
               label="Password"
+              type="password"
               variant="outlined"
               fullWidth
               value={password}

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import { Toaster } from "sonner";
+import { CookiesProvider } from "react-cookie";
 
 import Products from "./pages/Products";
 import ProductAdd from "./pages/ProductAdd";
@@ -14,21 +15,23 @@ import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Products />} />
-        <Route path="/products/new" element={<ProductAdd />} />
-        <Route path="/products/:id/edit" element={<ProductEdit />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/verify-payment" element={<PaymentVerify />} />
-        <Route path="/orders" element={<OrdersPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-      <Toaster />
-    </BrowserRouter>
+    <CookiesProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Products />} />
+          <Route path="/products/new" element={<ProductAdd />} />
+          <Route path="/products/:id/edit" element={<ProductEdit />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/verify-payment" element={<PaymentVerify />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+        <Toaster />
+      </BrowserRouter>
+    </CookiesProvider>
   );
 }
 

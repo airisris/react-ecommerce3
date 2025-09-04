@@ -10,9 +10,11 @@ import validator from "email-validator";
 import Paper from "@mui/material/Paper";
 import { signUp } from "../utils/api_user";
 import { useNavigate } from "react-router";
+import { useCookies } from "react-cookie";
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,13 +28,18 @@ const SignupPage = () => {
       // make sure the email is valid
       toast.error("Please use a valid email address");
     } else if (password !== cPassword) {
+      // check for password match
       toast.error("Password does not match");
     } else {
       // do sign up
       try {
         // create user
-        await signUp(name, email, password);
-        toast.success("You have successfully signed up");
+        const userData = await signUp(name, email, password);
+        // set cookies
+        setCookie("currentuser", userData, {
+          maxAge: 60 * 60 * 8, // expire in 8 hours
+        });
+        toast.success("You have successfully signed up an account");
         navigate("/");
       } catch (error) {
         console.log(error);
@@ -70,6 +77,7 @@ const SignupPage = () => {
           <Box mb={2}>
             <TextField
               label="Password"
+              type="password"
               variant="outlined"
               fullWidth
               value={password}

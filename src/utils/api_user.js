@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_URL } from "./constants";
 
 export const signUp = async (name, email, password) => {
-  const response = await axios.post(API_URL + "users/" + "signup", {
+  const response = await axios.post(API_URL + "users/signup", {
     name,
     email,
     password,
@@ -13,7 +13,7 @@ export const signUp = async (name, email, password) => {
 };
 
 export const logIn = async (email, password) => {
-  const response = await axios.post(API_URL + "users/" + "login", {
+  const response = await axios.post(API_URL + "users/login", {
     email,
     password,
   });
