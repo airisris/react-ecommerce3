@@ -18,15 +18,19 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { CircularProgress, Typography } from "@mui/material";
+import { useCookies } from "react-cookie";
 
 const OrdersPage = () => {
+  const [cookies] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error if user not logged in
+  const { token = "" } = currentuser;
   // store orders data from API
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // call the API
   useEffect(() => {
-    getOrders()
+    getOrders(token)
       .then((data) => {
         // putting the data into orders state
         setOrders(data);
@@ -34,7 +38,7 @@ const OrdersPage = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, []); // call only once when the page load
+  }, [token]); // call only once when the page load
 
   const handleOrderDelete = async (id) => {
     Swal.fire({
@@ -47,9 +51,9 @@ const OrdersPage = () => {
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await deleteOrder(id);
+        await deleteOrder(id, token);
         //method 1
-        const updatedOrders = await getOrders();
+        const updatedOrders = await getOrders(token);
         setOrders(updatedOrders);
         // method 2
         // setOrders(orders.filter((i) => i._id !== id));
@@ -114,13 +118,16 @@ const OrdersPage = () => {
                             label="Status"
                             onChange={async (event) => {
                               setLoading(true);
-                              await updateOrder(o._id, event.target.value);
-                              const updatedOrders = await getOrders();
+                              await updateOrder(o._id, event.target.value, token);
+                              const updatedOrders = await getOrders(token);
                               setOrders(updatedOrders);
                               toast.info("Status has been updated");
                               setLoading(false);
                             }}
-                            disabled={o.status === "pending"}
+                            disabled={
+                              o.status === "pending" ||
+                              currentuser.role === "user"
+                            }
                           >
                             <MenuItem value="pending" disabled>
                               Pending
@@ -134,9 +141,10 @@ const OrdersPage = () => {
                     </TableCell>
                     <TableCell>{o.paid_at}</TableCell>
                     <TableCell>
-                      {o.status === "pending" && (
+                      {o.status === "pending" &&
+                      currentuser.role === "admin" ? (
                         <Button
-                          variant="outlined"
+                          variant="contained"
                           color="error"
                           onClick={() => {
                             handleOrderDelete(o._id);
@@ -144,7 +152,7 @@ const OrdersPage = () => {
                         >
                           Delete
                         </Button>
-                      )}
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 ))

@@ -13,22 +13,25 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useState } from "react";
-import Swal from "sweetalert2";
 import { toast } from "sonner";
 import validator from "email-validator";
 import { createOrder } from "../utils/api_orders";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useCookies } from "react-cookie";
 
 const CheckoutPage = () => {
+  const [cookies] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error if user not logged in
+  const { token = "", email = "", name = "" } = currentuser;
   // load the cart items from the local storage
   const productsInLocalStorage = localStorage.getItem("cart");
 
   const [cart, setCart] = useState(
     productsInLocalStorage ? JSON.parse(productsInLocalStorage) : []
   );
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // const [name, setName] = useState("");
+  // const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
   // total price calculation
@@ -81,7 +84,7 @@ const CheckoutPage = () => {
                 variant="outlined"
                 fullWidth
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                // onChange={(e) => setName(e.target.value)}
               />
             </Box>
             <Box mb={2}>
@@ -90,7 +93,7 @@ const CheckoutPage = () => {
                 variant="outlined"
                 fullWidth
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                // onChange={(e) => setEmail(e.target.value)}
               />
             </Box>
             <Box mb={2}>
